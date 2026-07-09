@@ -46,11 +46,12 @@ Ejecuta en el **SQL Editor** de Supabase el archivo
 El endpoint es **`GET /api/cron/clima`** y está protegido con `CRON_SECRET`.
 
 ### Opción A — Vercel Cron (ya configurado en `vercel.json`)
-Se ejecuta según `"schedule": "0 * * * *"` (cada hora). Vercel añade automáticamente la
-cabecera `Authorization: Bearer $CRON_SECRET`.
+Se ejecuta según `"schedule": "0 11 * * *"` (una vez al día, 11:00 UTC = 6 a.m. Perú).
+Vercel añade automáticamente la cabecera `Authorization: Bearer $CRON_SECRET`.
 
-> 🔸 **Plan Hobby (gratis)**: los cron de Vercel se ejecutan **solo 1 vez al día**. Para
-> avisos por hora necesitas el plan Pro **o** la Opción B.
+> 🔸 **Plan Hobby (gratis)**: los cron de Vercel se ejecutan **solo 1 vez al día** (por eso
+> el horario es diario). Para avisos **por hora**, usa la Opción B o sube al plan Pro y
+> cambia el schedule a `0 * * * *`.
 
 ### Opción B — Cron externo gratis (recomendado en Hobby)
 Usa [cron-job.org](https://cron-job.org) (gratis) para llamar cada hora a:
