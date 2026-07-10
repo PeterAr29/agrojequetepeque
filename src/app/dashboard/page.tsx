@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Tractor, Sprout, Wallet, Landmark, type LucideIcon } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { formatoSoles } from "@/lib/types";
+import { ICONOS_MODULO } from "@/components/ui/iconos";
 import GraficoMensual from "@/components/ui/GraficoMensual";
 import AlertaClima from "@/components/ui/AlertaClima";
+import Skeleton from "@/components/ui/Skeleton";
 
 type Movimiento = { fecha: string; monto: number };
 
@@ -90,36 +93,44 @@ export default function Dashboard() {
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <KpiCard
-          icono="🚜"
+          Icono={Tractor}
           fondo="bg-green-100"
+          iconoColor="text-green-700"
           etiqueta="Parcelas Registradas"
           badge="Activas"
           badgeColor="text-green-600"
-          valor={cargando ? "…" : String(totalParcelas)}
+          cargando={cargando}
+          valor={String(totalParcelas)}
         />
         <KpiCard
-          icono="🌱"
+          Icono={Sprout}
           fondo="bg-emerald-100"
+          iconoColor="text-emerald-700"
           etiqueta="Cultivos Registrados"
           badge="Activos"
           badgeColor="text-emerald-600"
-          valor={cargando ? "…" : String(totalCultivos)}
+          cargando={cargando}
+          valor={String(totalCultivos)}
         />
         <KpiCard
-          icono="💰"
+          Icono={Wallet}
           fondo="bg-red-100"
+          iconoColor="text-red-600"
           etiqueta="Gastos Totales"
           badge="Egresos"
           badgeColor="text-red-600"
-          valor={cargando ? "…" : formatoSoles(totalGastos)}
+          cargando={cargando}
+          valor={formatoSoles(totalGastos)}
         />
         <KpiCard
-          icono="🏦"
+          Icono={Landmark}
           fondo="bg-blue-100"
+          iconoColor="text-blue-600"
           etiqueta="Ingresos Totales"
           badge="Ventas"
           badgeColor="text-blue-600"
-          valor={cargando ? "…" : formatoSoles(totalIngresos)}
+          cargando={cargando}
+          valor={formatoSoles(totalIngresos)}
         />
       </div>
 
@@ -133,9 +144,11 @@ export default function Dashboard() {
           }`}
         >
           <p className="text-white/80 text-lg">Balance neto</p>
-          <h2 className="text-4xl font-bold mt-2">
-            {cargando ? "…" : formatoSoles(balance)}
-          </h2>
+          {cargando ? (
+            <Skeleton className="h-10 w-40 mt-2 bg-white/30" />
+          ) : (
+            <h2 className="text-4xl font-bold mt-2">{formatoSoles(balance)}</h2>
+          )}
           <p className="text-white/80 mt-3 text-sm">
             {balance >= 0
               ? "✅ Tus ingresos superan a tus gastos."
@@ -159,61 +172,76 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <AccesoRapido href="/dashboard/parcelas" icono="🚜" titulo="Parcelas" texto="Gestión de terrenos agrícolas." />
-        <AccesoRapido href="/dashboard/cultivos" icono="🌱" titulo="Cultivos" texto="Control de siembras y cosechas." />
-        <AccesoRapido href="/dashboard/riegos" icono="💧" titulo="Riegos" texto="Seguimiento del riego agrícola." />
-        <AccesoRapido href="/dashboard/produccion" icono="📈" titulo="Producción" texto="Rendimiento y cosechas." />
-        <AccesoRapido href="/dashboard/gastos" icono="💰" titulo="Gastos" texto="Costos operativos agrícolas." />
-        <AccesoRapido href="/dashboard/ingresos" icono="🏦" titulo="Ingresos" texto="Ventas y rentabilidad." />
+        <AccesoRapido href="/dashboard/parcelas" modulo="parcelas" titulo="Parcelas" texto="Gestión de terrenos agrícolas." />
+        <AccesoRapido href="/dashboard/cultivos" modulo="cultivos" titulo="Cultivos" texto="Control de siembras y cosechas." />
+        <AccesoRapido href="/dashboard/riegos" modulo="riegos" titulo="Riegos" texto="Seguimiento del riego agrícola." />
+        <AccesoRapido href="/dashboard/produccion" modulo="produccion" titulo="Producción" texto="Rendimiento y cosechas." />
+        <AccesoRapido href="/dashboard/gastos" modulo="gastos" titulo="Gastos" texto="Costos operativos agrícolas." />
+        <AccesoRapido href="/dashboard/ingresos" modulo="ingresos" titulo="Ingresos" texto="Ventas y rentabilidad." />
       </div>
     </div>
   );
 }
 
 function KpiCard({
-  icono,
+  Icono,
   fondo,
+  iconoColor,
   etiqueta,
   badge,
   badgeColor,
+  cargando,
   valor,
 }: {
-  icono: string;
+  Icono: LucideIcon;
   fondo: string;
+  iconoColor: string;
   etiqueta: string;
   badge: string;
   badgeColor: string;
+  cargando: boolean;
   valor: string;
 }) {
   return (
-    <div className="bg-white rounded-3xl shadow-lg border border-slate-200 p-6 hover:shadow-2xl transition-all">
+    <div className="bg-white rounded-3xl shadow-lg border border-slate-200 p-6 hover:shadow-2xl hover:-translate-y-1 transition-all">
       <div className="flex justify-between items-center mb-4">
-        <div className={`${fondo} p-4 rounded-2xl text-3xl`}>{icono}</div>
+        <div className={`${fondo} p-4 rounded-2xl`}>
+          <Icono className={`w-7 h-7 ${iconoColor}`} />
+        </div>
         <span className={`${badgeColor} font-semibold`}>{badge}</span>
       </div>
       <p className="text-slate-500">{etiqueta}</p>
-      <h2 className="text-3xl font-bold text-slate-800 mt-2 break-words">{valor}</h2>
+      {cargando ? (
+        <Skeleton className="h-8 w-24 mt-3" />
+      ) : (
+        <h2 className="text-3xl font-bold text-slate-800 mt-2 break-words">
+          {valor}
+        </h2>
+      )}
     </div>
   );
 }
 
 function AccesoRapido({
   href,
-  icono,
+  modulo,
   titulo,
   texto,
 }: {
   href: string;
-  icono: string;
+  modulo: string;
   titulo: string;
   texto: string;
 }) {
+  const Icono = ICONOS_MODULO[modulo];
   return (
     <a
       href={href}
-      className="bg-white rounded-3xl shadow-lg border border-slate-200 p-6 hover:shadow-2xl hover:-translate-y-1 transition-all"
+      className="group bg-white rounded-3xl shadow-lg border border-slate-200 p-6 hover:shadow-2xl hover:-translate-y-1 transition-all"
     >
-      <div className="text-5xl mb-4">{icono}</div>
+      <div className="inline-flex p-4 mb-4 rounded-2xl bg-green-100 text-green-700 group-hover:bg-green-600 group-hover:text-white transition-colors">
+        <Icono className="w-8 h-8" />
+      </div>
       <h3 className="text-xl font-bold text-slate-800">{titulo}</h3>
       <p className="text-slate-500 mt-2">{texto}</p>
     </a>
