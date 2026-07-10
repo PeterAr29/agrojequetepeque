@@ -16,6 +16,7 @@ const menu = [
   { nombre: "Producción", ruta: "/dashboard/produccion", icono: "produccion" },
   { nombre: "Gastos", ruta: "/dashboard/gastos", icono: "gastos" },
   { nombre: "Ingresos", ruta: "/dashboard/ingresos", icono: "ingresos" },
+  { nombre: "Configuración", ruta: "/dashboard/configuracion", icono: "configuracion" },
 ];
 
 export default function Sidebar({
@@ -85,7 +86,7 @@ export default function Sidebar({
                 onClick={onCerrar}
                 className={`flex items-center gap-4 px-5 py-4 rounded-xl mb-2 transition-all ${
                   activo
-                    ? "bg-white text-green-800 font-bold shadow-lg"
+                    ? "bg-white/95 text-green-900 font-bold shadow-lg"
                     : "hover:bg-green-700"
                 }`}
               >

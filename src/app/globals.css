@@ -1,7 +1,11 @@
 @import "tailwindcss";
 
-/* Variables globales */
-:root {
+/* Permite usar `dark:` en clases puntuales, basado en data-theme. */
+@custom-variant dark (&:where([data-theme="oscuro"], [data-theme="oscuro"] *));
+
+/* ===== Variables por tema ===== */
+:root,
+[data-theme="claro"] {
   --background: #f1f5f9;
   --foreground: #0f172a;
 
@@ -12,7 +16,18 @@
   --primary-hover: #166534;
 }
 
-/* Tema fijo claro */
+[data-theme="oscuro"] {
+  --background: #0b1220;
+  --foreground: #e2e8f0;
+
+  --card: #1e293b;
+  --border: #334155;
+
+  --primary: #22c55e;
+  --primary-hover: #16a34a;
+}
+
+/* Base */
 html,
 body {
   margin: 0;
@@ -79,4 +94,97 @@ button {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #64748b;
+}
+
+/* ============================================================
+   MODO OSCURO — remapeo de la paleta neutra
+   ------------------------------------------------------------
+   El proyecto usa colores fijos de Tailwind (bg-white, text-slate-*,
+   bg-slate-*, border-slate-*). En vez de añadir variantes `dark:` en
+   decenas de archivos, aquí remapeamos esas clases neutras cuando el
+   tema es oscuro. Los acentos (verde, rojo, azul, amarillo) se mantienen.
+   Estas reglas viven fuera de @layer, así ganan a las utilidades de
+   Tailwind sin necesidad de !important.
+   ============================================================ */
+
+/* Fondos neutros */
+[data-theme="oscuro"] .bg-white {
+  background-color: var(--card);
+}
+[data-theme="oscuro"] .bg-slate-100 {
+  background-color: var(--background);
+}
+[data-theme="oscuro"] .bg-slate-50 {
+  background-color: #263449;
+}
+[data-theme="oscuro"] .bg-slate-200 {
+  background-color: #334155;
+}
+
+/* Texto neutro */
+[data-theme="oscuro"] .text-slate-900,
+[data-theme="oscuro"] .text-slate-800,
+[data-theme="oscuro"] .text-slate-700 {
+  color: #e2e8f0;
+}
+[data-theme="oscuro"] .text-slate-600,
+[data-theme="oscuro"] .text-slate-500 {
+  color: #94a3b8;
+}
+[data-theme="oscuro"] .text-slate-400 {
+  color: #64748b;
+}
+
+/* Verde de marca: se aclara para leerse sobre fondos oscuros */
+[data-theme="oscuro"] .text-green-700,
+[data-theme="oscuro"] .text-green-800,
+[data-theme="oscuro"] .text-green-600 {
+  color: #4ade80;
+}
+
+/* Bordes */
+[data-theme="oscuro"] .border-slate-200,
+[data-theme="oscuro"] .border-slate-300 {
+  border-color: #334155;
+}
+[data-theme="oscuro"] .border-slate-100 {
+  border-color: #1e293b;
+}
+
+/* Chips pastel → tinte translúcido (el texto de acento se mantiene) */
+[data-theme="oscuro"] .bg-green-100 {
+  background-color: rgba(34, 197, 94, 0.15);
+}
+[data-theme="oscuro"] .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.15);
+}
+[data-theme="oscuro"] .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+[data-theme="oscuro"] .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+[data-theme="oscuro"] .bg-yellow-100 {
+  background-color: rgba(234, 179, 8, 0.15);
+}
+
+/* Inputs en oscuro */
+[data-theme="oscuro"] input,
+[data-theme="oscuro"] select,
+[data-theme="oscuro"] textarea {
+  background: #263449;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+[data-theme="oscuro"] input::placeholder,
+[data-theme="oscuro"] textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* Scrollbar en oscuro */
+[data-theme="oscuro"] ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+[data-theme="oscuro"] ::-webkit-scrollbar-thumb {
+  background: #475569;
 }

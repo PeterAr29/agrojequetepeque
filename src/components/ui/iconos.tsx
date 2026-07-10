@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Wallet,
   Landmark,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 
@@ -25,4 +26,5 @@ export const ICONOS_MODULO: Record<string, LucideIcon> = {
   produccion: TrendingUp,
   gastos: Wallet,
   ingresos: Landmark,
+  configuracion: Settings,
 };
