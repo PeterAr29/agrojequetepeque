@@ -2,18 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LogOut, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useConfirm, useToast } from "@/components/ui/FeedbackProvider";
+import { ICONOS_MODULO } from "@/components/ui/iconos";
 
 const menu = [
-  { nombre: "Dashboard", ruta: "/dashboard", icono: "📊" },
-  { nombre: "Clima", ruta: "/dashboard/clima", icono: "🌦️" },
-  { nombre: "Parcelas", ruta: "/dashboard/parcelas", icono: "🚜" },
-  { nombre: "Cultivos", ruta: "/dashboard/cultivos", icono: "🌱" },
-  { nombre: "Riegos", ruta: "/dashboard/riegos", icono: "💧" },
-  { nombre: "Producción", ruta: "/dashboard/produccion", icono: "📈" },
-  { nombre: "Gastos", ruta: "/dashboard/gastos", icono: "💰" },
-  { nombre: "Ingresos", ruta: "/dashboard/ingresos", icono: "🏦" },
+  { nombre: "Dashboard", ruta: "/dashboard", icono: "dashboard" },
+  { nombre: "Clima", ruta: "/dashboard/clima", icono: "clima" },
+  { nombre: "Parcelas", ruta: "/dashboard/parcelas", icono: "parcelas" },
+  { nombre: "Cultivos", ruta: "/dashboard/cultivos", icono: "cultivos" },
+  { nombre: "Riegos", ruta: "/dashboard/riegos", icono: "riegos" },
+  { nombre: "Producción", ruta: "/dashboard/produccion", icono: "produccion" },
+  { nombre: "Gastos", ruta: "/dashboard/gastos", icono: "gastos" },
+  { nombre: "Ingresos", ruta: "/dashboard/ingresos", icono: "ingresos" },
 ];
 
 export default function Sidebar({
@@ -65,16 +67,17 @@ export default function Sidebar({
           {/* Botón cerrar (solo móvil) */}
           <button
             onClick={onCerrar}
-            className="lg:hidden text-2xl text-green-200 hover:text-white"
+            className="lg:hidden text-green-200 hover:text-white"
             aria-label="Cerrar menú"
           >
-            ×
+            <X className="w-7 h-7" />
           </button>
         </div>
 
         <nav className="px-4 flex-1 overflow-y-auto">
           {menu.map((item) => {
             const activo = pathname === item.ruta;
+            const Icono = ICONOS_MODULO[item.icono];
             return (
               <Link
                 key={item.ruta}
@@ -86,7 +89,7 @@ export default function Sidebar({
                     : "hover:bg-green-700"
                 }`}
               >
-                <span className="text-xl">{item.icono}</span>
+                <Icono className="w-5 h-5 shrink-0" />
                 {item.nombre}
               </Link>
             );
@@ -95,10 +98,11 @@ export default function Sidebar({
 
         <div className="p-4">
           <button
-            className="w-full bg-red-600 hover:bg-red-700 py-3 rounded-xl transition"
+            className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 py-3 rounded-xl transition active:scale-95"
             onClick={cerrarSesion}
           >
-            🚪 Cerrar Sesión
+            <LogOut className="w-5 h-5" />
+            Cerrar Sesión
           </button>
         </div>
       </aside>
