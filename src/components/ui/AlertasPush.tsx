@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/FeedbackProvider";
+import { esAdmin } from "@/lib/admin";
 import { soportaNotificaciones, pedirPermiso } from "@/lib/notificaciones";
 import {
   pushConfigurado,
@@ -24,9 +25,16 @@ export default function AlertasPush() {
   const toast = useToast();
   const [estado, setEstado] = useState<Estado>("cargando");
   const [procesando, setProcesando] = useState(false);
+  const [admin, setAdmin] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(async () => {
+      // ¿La cuenta actual es administradora? (para mostrar el botón de prueba)
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setAdmin(esAdmin(user?.email));
+
       if (!soportaNotificaciones()) {
         setEstado("no-soportado");
         return;
@@ -129,14 +137,16 @@ export default function AlertasPush() {
   if (estado === "activo") {
     return (
       <div className="flex flex-wrap gap-2">
-        <button
-          onClick={probar}
-          disabled={procesando}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium disabled:opacity-60"
-          title="Enviar una notificación de prueba a este dispositivo"
-        >
-          🧪 Probar notificación
-        </button>
+        {admin && (
+          <button
+            onClick={probar}
+            disabled={procesando}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium disabled:opacity-60"
+            title="Enviar una notificación de prueba a este dispositivo (solo administrador)"
+          >
+            🧪 Probar notificación
+          </button>
+        )}
         <button
           onClick={desactivar}
           disabled={procesando}
