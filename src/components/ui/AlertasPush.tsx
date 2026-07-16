@@ -142,7 +142,7 @@ export default function AlertasPush() {
             onClick={probar}
             disabled={procesando}
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium disabled:opacity-60"
-            title="Enviar una notificación de prueba a este dispositivo (solo administrador)"
+            title="Enviar una notificación de prueba a todos los dispositivos suscritos (solo administrador)"
           >
             🧪 Probar notificación
           </button>

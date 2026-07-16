@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import webpush from "web-push";
+import { esAdmin } from "@/lib/admin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -48,17 +49,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Sesión no válida" }, { status: 401 });
   }
 
-  // --- 2. Suscripciones SOLO de este usuario ---
-  const { data: subs } = await db
-    .from("push_subscriptions")
-    .select("*")
-    .eq("usuario_id", user.id);
+  // --- 2. Suscripciones ---
+  // Admin → notifica a TODOS los dispositivos suscritos (útil para demostrar).
+  // Usuario normal → solo a los suyos.
+  const admin = esAdmin(user.email);
+
+  const consulta = db.from("push_subscriptions").select("*");
+  const { data: subs } = admin
+    ? await consulta
+    : await consulta.eq("usuario_id", user.id);
 
   if (!subs || subs.length === 0) {
     return NextResponse.json({
       ok: false,
       enviados: 0,
-      mensaje: "Este dispositivo no tiene alertas activadas.",
+      mensaje: admin
+        ? "No hay ningún dispositivo con alertas activadas."
+        : "Este dispositivo no tiene alertas activadas.",
     });
   }
 
@@ -91,5 +98,11 @@ export async function POST(request: Request) {
     }
   }
 
-  return NextResponse.json({ ok: true, enviados, eliminadas });
+  return NextResponse.json({
+    ok: true,
+    modo: admin ? "todos" : "propias",
+    suscripciones: subs.length,
+    enviados,
+    eliminadas,
+  });
 }
