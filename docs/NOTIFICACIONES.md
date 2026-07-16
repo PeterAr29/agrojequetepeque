@@ -89,3 +89,49 @@ Responde algo como `{"ok":true,"suscripciones":1,"enviados":1,"eliminadas":0}`.
   borra esa suscripción automáticamente.
 - **Umbral de lluvia**: se avisa si en las próximas 12 h hay ≥50 % de probabilidad o
   ≥0,2 mm (ajustable en `src/lib/clima.ts`).
+
+---
+
+## 6. Demostración / prueba rápida (modo `?test=1`)
+
+Cuando no hay lluvia pronosticada no se dispara ninguna alerta, así que para
+**verificar o demostrar** que las notificaciones llegan (por ejemplo, en una
+exposición) hay un **modo de prueba** que envía un aviso a **todas** las
+suscripciones **sin revisar el clima ni el anti-spam**:
+
+```
+https://agrojequetepeque.vercel.app/api/cron/clima?secret=TU_CRON_SECRET&test=1
+```
+
+> 🔑 Reemplaza `TU_CRON_SECRET` por el valor de `CRON_SECRET`
+> (**Vercel → Settings → Environment Variables**, o tu `.env.local`).
+> ⚠️ **No** escribas el secreto real en este archivo: el repositorio es público.
+
+Al abrir la URL, los dispositivos suscritos reciben al instante:
+
+> 🔔 **Prueba de alerta — AgroJequetepeque**
+> ¡Funciona! Así se verá el aviso cuando se espere lluvia en tus parcelas. 🌧️
+
+La página responde algo como:
+
+```json
+{"ok":true,"modo":"prueba","suscripciones":3,"enviados":3,"eliminadas":0}
+```
+
+- `enviados` = notificaciones que salieron bien (debe igualar el nº de celulares).
+- `eliminadas` = suscripciones caducadas que se limpiaron → reactiva las alertas
+  en ese teléfono (Clima → 🔔 Activar alertas).
+
+### Guion para el día de la exposición
+1. **5 min antes**: en cada celular, confirma que las alertas estén activas
+   (Clima → 🔔 Activar alertas de lluvia). Verifica internet y que el teléfono
+   **no** esté en silencio / No molestar.
+2. Ten la URL de prueba lista en el navegador de la laptop, **sin abrirla aún**.
+3. Explica el funcionamiento: el cron revisa Open-Meteo cada hora y, si se espera
+   lluvia en una parcela, envía la notificación **aunque la app esté cerrada**.
+4. **Cierra la app** (o bloquea la pantalla) en los celulares para demostrarlo.
+5. Pulsa Enter en la URL → los celulares **suenan al instante**.
+
+> 💡 Prueba una vez el día anterior para confirmar que todo sigue bien. El modo
+> de prueba **no afecta** la lógica real: las alertas de lluvia siguen saliendo
+> solas por el cron cuando de verdad se espere lluvia.
