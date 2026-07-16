@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/FeedbackProvider";
 import { soportaNotificaciones, pedirPermiso } from "@/lib/notificaciones";
 import {
@@ -78,6 +79,43 @@ export default function AlertasPush() {
     }
   };
 
+  // Envía una notificación de prueba a los dispositivos de este usuario.
+  const probar = async () => {
+    setProcesando(true);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) {
+        toast.error("Debes iniciar sesión de nuevo.");
+        return;
+      }
+
+      const res = await fetch("/api/notificaciones/prueba", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+
+      if (res.ok && json.enviados > 0) {
+        toast.success(
+          `📩 Notificación de prueba enviada a ${json.enviados} dispositivo${
+            json.enviados === 1 ? "" : "s"
+          }.`
+        );
+      } else if (json.enviados === 0) {
+        toast.info(json.mensaje || "No hay dispositivos suscritos.");
+      } else {
+        toast.error(json.error || "No se pudo enviar la prueba.");
+      }
+    } catch {
+      toast.error("Error al enviar la notificación de prueba.");
+    } finally {
+      setProcesando(false);
+    }
+  };
+
   if (estado === "cargando") return null;
 
   if (estado === "no-soportado") {
@@ -90,14 +128,24 @@ export default function AlertasPush() {
 
   if (estado === "activo") {
     return (
-      <button
-        onClick={desactivar}
-        disabled={procesando}
-        className="bg-green-100 hover:bg-green-200 text-green-700 px-5 py-2.5 rounded-xl font-medium disabled:opacity-60"
-        title="Desactivar alertas"
-      >
-        🔔 Alertas activas · desactivar
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={probar}
+          disabled={procesando}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium disabled:opacity-60"
+          title="Enviar una notificación de prueba a este dispositivo"
+        >
+          🧪 Probar notificación
+        </button>
+        <button
+          onClick={desactivar}
+          disabled={procesando}
+          className="bg-green-100 hover:bg-green-200 text-green-700 px-5 py-2.5 rounded-xl font-medium disabled:opacity-60"
+          title="Desactivar alertas"
+        >
+          🔔 Alertas activas · desactivar
+        </button>
+      </div>
     );
   }
 
