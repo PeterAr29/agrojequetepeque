@@ -52,6 +52,46 @@ export async function GET(request: Request) {
   let enviados = 0;
   let eliminadas = 0;
 
+  // --- 3.5 MODO DE PRUEBA (?test=1) ---
+  // Envía una notificación de demostración a TODAS las suscripciones,
+  // sin revisar el clima ni respetar el anti-spam. Útil para verificar
+  // que las alertas llegan (p. ej. durante una exposición). Sigue
+  // protegido por CRON_SECRET como el resto del endpoint.
+  if (url.searchParams.get("test") === "1") {
+    const payload = JSON.stringify({
+      title: "🔔 Prueba de alerta — AgroJequetepeque",
+      body: "¡Funciona! Así se verá el aviso cuando se espere lluvia en tus parcelas. 🌧️",
+      url: "/dashboard/clima",
+    });
+
+    for (const sub of subs) {
+      try {
+        await webpush.sendNotification(
+          {
+            endpoint: sub.endpoint,
+            keys: { p256dh: sub.p256dh, auth: sub.auth },
+          },
+          payload
+        );
+        enviados++;
+      } catch (err) {
+        const status = (err as { statusCode?: number }).statusCode;
+        if (status === 404 || status === 410) {
+          await db.from("push_subscriptions").delete().eq("id", sub.id);
+          eliminadas++;
+        }
+      }
+    }
+
+    return NextResponse.json({
+      ok: true,
+      modo: "prueba",
+      suscripciones: subs.length,
+      enviados,
+      eliminadas,
+    });
+  }
+
   // Calcula la alerta de cada usuario una sola vez (varias suscripciones/usuario).
   const cacheAlerta = new Map<string, string | null>();
 
