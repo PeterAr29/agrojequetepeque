@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/FeedbackProvider";
 
 export default function RegisterPage() {
   const toast = useToast();
+  const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmar, setConfirmar] = useState("");
@@ -14,6 +15,10 @@ export default function RegisterPage() {
   const [cargando, setCargando] = useState(false);
 
   const register = async () => {
+    if (!nombre.trim()) {
+      toast.error("Ingresa tu nombre");
+      return;
+    }
     if (!email) {
       toast.error("Ingresa tu correo electrónico");
       return;
@@ -28,7 +33,13 @@ export default function RegisterPage() {
     }
 
     setCargando(true);
-    const { error } = await supabase.auth.signUp({ email, password });
+    // El nombre se guarda en user_metadata; el trigger de la BD lo usa para
+    // crear el perfil (columna "nombres" de public.perfiles).
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { nombres: nombre.trim() } },
+    });
     setCargando(false);
 
     if (error) {
@@ -68,6 +79,19 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Nombre
+              </label>
+              <input
+                type="text"
+                placeholder="Tu nombre"
+                className="w-full border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-green-500 outline-none"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
                 Correo Electrónico
